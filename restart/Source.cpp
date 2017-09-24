@@ -44,8 +44,8 @@ void dealersAction();
 
 void checkWinner();
 
-void bust(string loser);
-int victory(string winner, int playerPoints);
+void bust(int playerNo, int startOfCardArr);
+int victory(int winner, int playerPoints);
 void draw(string playerOne, string playerTwo);
 
 string charToString(char arg, string arg2);
@@ -88,6 +88,8 @@ bool dealersHidden = true;
 bool playersTurn = true;
 
 bool roundEnd = false;
+bool blackjack = false;
+
 bool gameOver = false;
 bool setUp = false;
 
@@ -103,6 +105,7 @@ int main()
 
 		// used to prevent a loop from being called later.
 		roundEnd = false;
+		blackjack = false;
 
 		for (int i = 0; i < noOfPlayers; i++)
 		{
@@ -116,13 +119,20 @@ int main()
 
 		currentScorePlayer();
 
-		currentScoreDealer();
-
-		// calls the function that allows the player to act.
-		playerAction();
-		if (roundEnd == false)
+		if (blackjack == false)
 		{
-			dealersAction();
+			
+			currentScoreDealer();
+
+			// calls the function that allows the player to act.
+
+			
+			playerAction();
+			if (roundEnd == false)
+			{
+				dealersAction();
+			}
+
 		}
 
 		//playerDealtCard();
@@ -412,7 +422,7 @@ void dealersAction() {
 		currentScoreDealer_2();
 
 
-		if (dealersCardsVal > playersCardsVal[0] && dealersCardsVal < 22)
+		if (dealersCardsVal >= playersCardsVal[0] && dealersCardsVal < 22)
 		{
 			getCard = false;
 			break;
@@ -420,8 +430,12 @@ void dealersAction() {
 
 		if (dealersCardsVal > 21)
 		{
-			getCard = false;
-			break;
+			bust(8, 0);
+			if (dealersCardsVal > 21)
+			{
+				getCard = false;
+				break;
+			}
 		}
 
 		Sleep(5000);
@@ -474,6 +488,8 @@ void currentScorePlayer(){
 
 	if (playersCardsVal[0] == 21 && noOfPlayerCards[0] == 2)
 	{
+		cout << "Player has a blackjack!" << endl;
+
 		if (dealersCardsVal == 21 && noOfDealerCards == 2)
 		{
 			cout << "The dealer checks their second card..." << endl;
@@ -484,13 +500,17 @@ void currentScorePlayer(){
 
 		else
 		{
-			victory(playerName[0], playersPoints[0]);
+			blackjack = true;
+			victory(0, playersPoints[0]);
+
+			roundEnd = true;
+			restart();
 		}
 	}
 
 	if (playersCardsVal[0] > 21)
 	{
-		bust("player");
+		bust(1, 0);
 	}
 
 
@@ -570,55 +590,50 @@ void dealerDealtCard()
 	noOfDealerCards++;
 }
 
-void bust(string loser)
+void bust(int playerNo, int startOfCardArr)
 {
-	if (loser == "player")
+	if (playerNo < 8)
 	{
-		for (int i = 0; i < noOfPlayerCards[0]; i++)
+		for (int i = 0; i < noOfPlayerCards[playerNo - 1]; i++)
 		{
-			if (playersCards[1][i] == 'A')
-			{
-				playersCardsVal[0] = playersCardsVal[0] - 10;
-				playersCards[1][i] = 'X';
-				cout << "Player plays an Ace as a 1." << endl;
-				cout << "Player's Total value = " << playersCardsVal[0] << endl;
 
+			if (playersCards[startOfCardArr + 1][i] == 'A')
+			{
+				while (playersCardsVal[playerNo - 1] > 21)
+				{
+					playersCardsVal[playerNo - 1] = playersCardsVal[playerNo - 1] - 10;
+					playersCards[startOfCardArr + 1][i] = 'X';
+					cout << "Player " << playerName[playerNo - 1] << " plays an Ace as a 1." << endl;
+					cout << "Player " << playerName[playerNo - 1] << "'s Total Value = " << playersCardsVal[playerNo - 1] << endl;
+				}
 			}
 		}
 
-		if (playersCardsVal[0] > 21)
+		if (playersCardsVal[playerNo - 1] > 21)
 		{
-			cout << "Player went bust!" << endl;
-			playersPoints[0] -= 10;
+			cout << "Player " << playerName[playerNo - 1] << " went bust!" << endl;
+			victory(8, playersPoints[0]);
 			roundEnd = true;
 			restart();
 		}
 	}
 
-	if (loser == "dealer")
+	if (playerNo == 8)
 	{
 		for (int i = 0; i < noOfDealerCards; i++)
 		{
 			if (dealersCards[1][i] == 'A')
 			{
-				dealersCardsVal = dealersCardsVal - 10;
-				dealersCards[1][i] = 'X';
-				cout << "Dealer plays an Ace as a 1." << endl;
-				cout << "Dealers's Total value = " << dealersCardsVal << endl;
+				while (dealersCardsVal > 21)
+				{
+					dealersCardsVal = dealersCardsVal - 10;
+					dealersCards[1][i] = 'X';
+					cout << "Dealer plays an Ace as a 1." << endl;
+					cout << "Dealers's Total value = " << dealersCardsVal << endl;
+				}
 
 			}
 		}
-
-		if (dealersCardsVal > 21)
-		{
-			cout << "The Dealer went bust!";
-			restart();
-		}
-	}
-
-	else
-	{
-
 	}
 }
 
@@ -634,33 +649,50 @@ void checkWinner()
 	cout << playersCardsVal[0] << endl;
 	if (dealersCardsVal >= playersCardsVal[0] && dealersCardsVal < 22)
 	{
-		victory("dealer", playersCardsVal[0]);
+		victory(8, playersCardsVal[0]);
 	}
 
 	else
 	{
-		victory(playerName[0], playersCardsVal[0]);
+		victory(0, playersCardsVal[0]);
 	}
-}
-
-int victory(string winner, int playerPoints)
-{
-	cout << winner << " is the winner. " << winner << " wins!" << endl;
-	roundEnd = true;
-
-	if (winner == playerName[0])
-	{
-		playerPoints = playerPoints + 10;
-	}
-
-	else
-	{
-		playerPoints = playerPoints - 10;
-	}
-	return playerPoints;
 
 	roundEnd = true;
 	restart();
+}
+
+int victory(int winner, int playerPoints)
+{
+
+	if (winner < 7)
+	{
+		cout << playerName[winner] << " is the winner. " << playerName[winner] << " wins!" << endl;
+		cout << "No of player cards = " << noOfPlayerCards[winner] << endl;
+
+		if (noOfPlayerCards[winner] == 2 && playersCardsVal[winner] == 21)
+		{
+			cout << "points before = " << playersPoints[winner] << endl;
+			playersPoints[winner] = playersPoints[winner] + 15;
+			cout << "points after = " << playersPoints[winner] << endl;
+		}
+
+		else
+		{
+			cout << "points before = " << playersPoints[winner] << endl;
+			playersPoints[winner] = playersPoints[winner] + 10;
+			cout << "points after = " << playersPoints[winner] << endl;
+		}
+	}
+
+	else
+	{
+		cout << "The dealer is the winner." << endl;
+		playersPoints[0] = playersPoints[0] - 10;
+
+	}
+
+	return playerPoints;
+
 }
 
 void draw(string playerOne, string playerTwo)
@@ -719,58 +751,38 @@ int convertCharToInt(char card, int points) {
 	if (card == 'K') {  points = points + 10; }
 	if (card == 'A')
 	{
-		if (playersTurn == true)
-		{
-			//cout << "Would you like to play your Ace as an 11 or a 1? ";
-			//int aceValue;
-			//while (true)
-			//{
-			//	cin >> aceValue;
-			//	if (aceValue == 11)
-			//	{
-			//		points = points + 11;
-			//		break;
-			//	}
+		points = points + 11;
 
-			//	if (aceValue == 1)
-			//	{
-			//		points = points + 1;
-			//		break;
-			//	}
+		//if (playersTurn == true)
+		//{
 
-			//	else if (cin.fail()) {
-			//		cin.clear();
-			//		cin.ignore();
-			//		cout << "Please enter either 11 or 1. ";
-			//	}
-			//}
+		//	if (playersCardsVal[0] <= 10)
+		//	{
+		//		points = points + 11;
+		//	}
 
-			if (playersCardsVal[0] <= 10)
-			{
-				points = points + 11;
-			}
+		//	else
+		//	{
+		//		points = points + 1;
+		//		card = 'X';
+		//	}
+		//}
 
-			else
-			{
-				points = points + 1;
-				card = 'X';
-			}
-		}
+		//else
+		//{
+		//	if (dealersCardsVal <= 10)
+		//	{
+		//		points = points + 11;
+		//	}
 
-		else
-		{
-			if (dealersCardsVal <= 10)
-			{
-				points = points + 11;
-			}
-
-			else
-			{
-				points = points + 1;
-				card = 'X';
-			}
-		}
+		//	else
+		//	{
+		//		points = points + 1;
+		//		card = 'X';
+		//	}
+		//}
 	}
+
 
 	return points;
 }

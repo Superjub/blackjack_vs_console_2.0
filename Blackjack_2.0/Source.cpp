@@ -25,9 +25,6 @@ void settingUp();
 void dealInitialCards();
 int randomValue(int min, int max);
 
-int playersPoints[7] = { 100, 100, 100, 100, 100, 100, 100 };
-string playerName[7] = {"Player One", "Player Two", "Player Three", "Player Four", "Player Five", "Player Six", "Player Seven"};
-
 void currentScorePlayer();
 int currentScorePlayer_2(int arg1);
 
@@ -82,6 +79,11 @@ int noOfDealerCards = 0;
 int playersCardsVal[7] = { 0, 0, 0, 0, 0, 0, 0 };
 int dealersCardsVal = 0;
 
+int playersPoints[7] = { 100, 100, 100, 100, 100, 100, 100 };
+string playerName[7] = { "Player One", "Player Two", "Player Three", "Player Four", "Player Five", "Player Six", "Player Seven" };
+
+bool doubleDown[7] = { false, false, false, false, false, false, false };
+
 // bool to make the dealer's second card hidden on the first turn
 bool dealersHidden = true;
 
@@ -95,7 +97,8 @@ bool setUp = false;
 
 // main function
 int main()
-{
+{	
+	
 	callTitle();
 	do {
 
@@ -361,7 +364,8 @@ void playerAction() {
 	bool turnOver = false;
 	char response;
 	do {
-		cout << "What would you like to do? (s for stand/h for hit) : " << endl;
+		cout << doubleDown[0] << endl;
+		cout << "What would you like to do? (s for stand/h for hit/d for double down) : " << endl;
 		cin >> response;
 		if (response == 's')
 		{
@@ -374,12 +378,23 @@ void playerAction() {
 			currentScorePlayer();
 		}
 
+		if (response == 'd')
+		{
+			doubleDown[0] = true;
+			
+			playerDealtCard();
+			currentScorePlayer();
+
+			turnOver = true;
+
+		}
+
 		else if (response != 's' && response != 'h')
 		{
 			cout << "Not valid response." << endl;
 		}
 
-	} while (turnOver == false && roundEnd == false);
+	} while (turnOver == false && doubleDown[0] == false || turnOver == false && roundEnd == false);
 }
 
 void dealersAction() {
@@ -669,17 +684,26 @@ int victory(int winner, int playerPoints)
 		cout << playerName[winner] << " is the winner. " << playerName[winner] << " wins!" << endl;
 		cout << "No of player cards = " << noOfPlayerCards[winner] << endl;
 
-		if (noOfPlayerCards[winner] == 2 && playersCardsVal[winner] == 21)
+		if (noOfPlayerCards[winner] != 2 || playersCardsVal[winner] != 21)
 		{
 			cout << "points before = " << playersPoints[winner] << endl;
-			playersPoints[winner] = playersPoints[winner] + 15;
+			if (!doubleDown[winner])
+			{
+				playersPoints[winner] = playersPoints[winner] + 10;
+			}
+			else
+			{
+				playersPoints[winner] = playersPoints[winner] + 20;
+			}
 			cout << "points after = " << playersPoints[winner] << endl;
 		}
 
-		else
+		if (noOfPlayerCards[winner] == 2 && playersCardsVal[winner] == 21)
 		{
 			cout << "points before = " << playersPoints[winner] << endl;
-			playersPoints[winner] = playersPoints[winner] + 10;
+
+			playersPoints[winner] = playersPoints[winner] + 15;
+
 			cout << "points after = " << playersPoints[winner] << endl;
 		}
 	}
@@ -687,7 +711,18 @@ int victory(int winner, int playerPoints)
 	else
 	{
 		cout << "The dealer is the winner." << endl;
-		playersPoints[0] = playersPoints[0] - 10;
+
+		cout << "points before = " << playersPoints[0] << endl;
+		
+		if (!doubleDown[0])
+		{
+			playersPoints[0] = playersPoints[0] - 10;
+		}
+		else
+		{
+			playersPoints[0] = playersPoints[0] - 20;
+		}
+		cout << "points after = " << playersPoints[0] << endl;
 
 	}
 
@@ -718,14 +753,20 @@ void restart()
 		dealersCards[0][i] = '\0';
 		dealersCards[1][i] = '\0';
 
-		noOfPlayerCards[0] = 0;
-		noOfDealerCards = 0;
 
-		playersCardsVal[0] = 0;
-		dealersCardsVal = 0;
-
-		dealersHidden = true;
 	}
+
+	for (int i = 0; i < noOfPlayers; i++)
+	{
+		noOfPlayerCards[i] = 0;
+		playersCardsVal[i] = 0;
+		doubleDown[i] = false;
+	}
+
+	blackjack = false;
+	noOfDealerCards = 0;
+	dealersCardsVal = 0;
+	dealersHidden = true;
 
 	system("CLS");
 	if (response == 'n')

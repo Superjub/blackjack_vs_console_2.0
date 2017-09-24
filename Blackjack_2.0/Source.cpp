@@ -1,3 +1,5 @@
+// test
+
 // header files
 #include <Windows.h>
 
@@ -33,7 +35,7 @@ void currentScoreDealer_2();
 
 int convertCharToInt(char card, int points);
 
-void playerDealtCard();
+void playerDealtCard(int currentPlayer, int currentPlayerCard);
 void playerAction();
 
 void dealerDealtCard();
@@ -47,6 +49,8 @@ void draw(string playerOne, string playerTwo);
 
 string charToString(char arg, string arg2);
 int charToInt(char arg, int arg2);
+
+void changeActivePlayer();
 
 void restart();
 
@@ -64,6 +68,9 @@ char cards[4][13] = { { '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', '
 
 
 int noOfPlayers;
+
+int currentActivePlayer = 0;
+int currentCardArrStart = 0;
 
 // player's/dealer's cards- due to the nature of the game card # can not exceed 22 (assuming a player gets 22 aces.)
 
@@ -197,157 +204,87 @@ void placeBets()
 
 void dealInitialCards()
 {
-	int noOfCardsToBeDealt = ((noOfPlayers + 1) * 2);
-	
+	int noOfCardsToBeDealt = (noOfPlayers * 2);
+
 	cout << "Starting the game..." << endl;
 	Sleep(3000);
 
 	cout << endl;
 
-	for (int i = 0; i <= noOfCardsToBeDealt; i++)
-	{
-		int cardSuit = randomValue(0, 3);
+	int cardSuit;
+	int cardValue;
 
-		int cardValue = randomValue(0, 12);
-
-
-		if (i == 0)
-		{
-			//cout << "----" << endl;
-			//cout << "(IGNORE ME!" << endl;
-			//cout << "Card Suit " << cardSuit << endl;
-			//cout << "Card value " << cardValue << endl;
-			//cout << "-----" << endl;
-
-			playersCards[1][0] = cards[cardSuit][cardValue];
-
-			if (cardSuit == 0) playersCards[0][0] = 's';
-			if (cardSuit == 1) playersCards[0][0] = 'h';
-			if (cardSuit == 2) playersCards[0][0] = 'd';
-			if (cardSuit == 3) playersCards[0][0] = 'c';
-
-			cout << "Player " << playerName[0] << " drew a " << playersCards[1][0] << " of " << playersCards[0][0] << endl;
-			noOfPlayerCards[0]++;
-
-			Sleep(1000);
-		}
-
-		// More than one player
-		if (noOfPlayers >= 2)
-		{
-			if (i == 1)
-			{
-				playersCards[3][0] = cards[cardSuit][cardValue];
-
-				if (cardSuit == 0) playersCards[2][0] = 's';
-				if (cardSuit == 1) playersCards[2][0] = 'h';
-				if (cardSuit == 2) playersCards[2][0] = 'd';
-				if (cardSuit == 3) playersCards[2][0] = 'c';
-
-				cout << "Player " << playerName[1] << " drew a " << playersCards[3][0] << " of " << playersCards[2][0] << endl;
-				noOfPlayerCards[1]++;
-
-				Sleep(1000);
-			}
-		}
-
-		if (i == noOfPlayers)
-		{
-
-			dealersCards[1][0] = cards[cardSuit][cardValue];
-
-			if (cardSuit == 0) dealersCards[0][0] = 's';
-			if (cardSuit == 1) dealersCards[0][0] = 'h';
-			if (cardSuit == 2) dealersCards[0][0] = 'd';
-			if (cardSuit == 3) dealersCards[0][0] = 'c';
-
-			cout << "The dealer drew a " << dealersCards[1][0] << " of " << dealersCards[0][0] << endl;
-
-			noOfDealerCards++;
-
-			Sleep(1000);
-			cout << endl;
-		}
-
-		if (i == (noOfPlayers + 1)) 
-		{
-
-			playersCards[1][1] = cards[cardSuit][cardValue];
-
-			if (cardSuit == 0) playersCards[0][1] = 's';
-			if (cardSuit == 1) playersCards[0][1] = 'h';
-			if (cardSuit == 2) playersCards[0][1] = 'd';
-			if (cardSuit == 3) playersCards[0][1] = 'c';
-
-			cout << "Player " << playerName[0] << " drew a " << playersCards[1][1]  << " of " << playersCards[0][1] << endl;
-
-			noOfPlayerCards[0]++;
-
-			Sleep(1000);
-		}
-
-		// More than one player
-		if (noOfPlayers >= 2)
-		{
-			if (i == (noOfPlayers + 2))
-			{
-				playersCards[3][1] = cards[cardSuit][cardValue];
-
-				if (cardSuit == 0) playersCards[2][1] = 's';
-				if (cardSuit == 1) playersCards[2][1] = 'h';
-				if (cardSuit == 2) playersCards[2][1] = 'd';
-				if (cardSuit == 3) playersCards[2][1] = 'c';
-
-				cout << "Player " << playerName[1] << " drew a " << playersCards[3][1] << " of " << playersCards[2][1] << endl;
-				noOfPlayerCards[1]++;
-
-				Sleep(1000);
-			}
-		}
-
-		if (i == noOfCardsToBeDealt)
-		{
-
-			dealersCards[1][1] = cards[cardSuit][cardValue];
-
-			if (cardSuit == 0) dealersCards[0][1] = 's';
-			if (cardSuit == 1) dealersCards[0][1] = 'h';
-			if (cardSuit == 2) dealersCards[0][1] = 'd';
-			if (cardSuit == 3) dealersCards[0][1] = 'c';
-			cout << "The dealer drew a card and places it face down." << endl;
-			//cout << "debugging" << endl;
-			//cout << "-----" << endl;
-			//cout << "The dealer drew a " << dealersCards[1][1] << " of " << dealersCards[0][1] << endl;
-			//cout << "-----" << endl;
-
-			noOfDealerCards++;
-
-			Sleep(1000);
-			cout << endl;
-		}
-
-	}
-	cout << endl;
-
-	//cout << "The player has " << playersCards[1][0] << " of " << playersCards[0][0] << " and " << playersCards[1][1] << " of " << playersCards[0][1] << "." << endl;
-
-	int x = 1;
+	//cout << "Current active player = " << currentActivePlayer << endl;
+	//cout << "Current beginning of active players card array = " << currentCardArrStart << endl;
 
 	for (int i = 0; i < noOfPlayers; i++)
 	{
-		cout << "Player " << playerName[i] << " has " << playersCards[x + i][0] << " of " << playersCards[2 * i][0] << " and " << playersCards[x + i][1] << " of " << playersCards[2 * i][1] << "." << endl;
-		x++;
+
+		cardSuit = randomValue(0, 3);
+		cardValue = randomValue(0, 12);
+
+		playersCards[currentCardArrStart + 1][0] = cards[cardSuit][cardValue];
+
+		if (cardSuit == 0) playersCards[currentCardArrStart][0] = 's';
+		if (cardSuit == 1) playersCards[currentCardArrStart][0] = 'h';
+		if (cardSuit == 2) playersCards[currentCardArrStart][0] = 'd';
+		if (cardSuit == 3) playersCards[currentCardArrStart][0] = 'c';
+
+		cout << "Player " << playerName[currentActivePlayer] << " drew a " << playersCards[currentCardArrStart + 1][0] << " of " << playersCards[currentCardArrStart][0] << endl;
+
+		noOfPlayerCards[currentActivePlayer]++;
+		changeActivePlayer();
+		Sleep(1000);
 	}
 
-	cout << "The dealer has " << dealersCards[1][0] << " of " << dealersCards[0][0] << " and ?." << endl;
+	cardSuit = randomValue(0, 3);
+	cardValue = randomValue(0, 12);
+
+	dealersCards[1][0] = cards[cardSuit][cardValue];
+
+	if (cardSuit == 0) dealersCards[0][0] = 's';
+	if (cardSuit == 1) dealersCards[0][0] = 'h';
+	if (cardSuit == 2) dealersCards[0][0] = 'd';
+	if (cardSuit == 3) dealersCards[0][0] = 'c';
+
+	cout << "The dealer drew a " << dealersCards[1][0] << " of " << dealersCards[0][0] << endl;
 	cout << endl;
+
+	for (int i = 0; i < noOfPlayers; i++)
+	{
+
+		cardSuit = randomValue(0, 3);
+		cardValue = randomValue(0, 12);
+
+		playersCards[currentCardArrStart + 1][1] = cards[cardSuit][cardValue];
+
+		if (cardSuit == 0) playersCards[currentCardArrStart][1] = 's';
+		if (cardSuit == 1) playersCards[currentCardArrStart][1] = 'h';
+		if (cardSuit == 2) playersCards[currentCardArrStart][1] = 'd';
+		if (cardSuit == 3) playersCards[currentCardArrStart][1] = 'c';
+
+		cout << "Player " << playerName[currentActivePlayer] << " drew a " << playersCards[currentCardArrStart + 1][1] << " of " << playersCards[currentCardArrStart][1] << endl;
+
+		noOfPlayerCards[currentActivePlayer]++;
+		changeActivePlayer();
+		Sleep(1000);
+	}
+
+	cardSuit = randomValue(0, 3);
+	cardValue = randomValue(0, 12);
+
+	dealersCards[1][1] = cards[cardSuit][cardValue];
+
+	if (cardSuit == 0) dealersCards[0][1] = 's';
+	if (cardSuit == 1) dealersCards[0][1] = 'h';
+	if (cardSuit == 2) dealersCards[0][1] = 'd';
+	if (cardSuit == 3) dealersCards[0][1] = 'c';
+
+	cout << "The dealer drew a card and places it face down." << endl;
 	cout << "debugging" << endl;
 	cout << "-----" << endl;
-	cout << "The dealer has " << dealersCards[1][0] << " of " << dealersCards[0][0] << " and " << dealersCards[1][1] << " of " << dealersCards[0][1] << "." << endl;
+	cout << "The dealer drew a " << dealersCards[1][1] << " of " << dealersCards[0][1] << endl;
 	cout << "-----" << endl;
-	cout << "# of player cards is " << noOfPlayerCards[0] << " and # of dealer cards is " << noOfDealerCards << endl;
-	cout << "------" << endl;
-	cout << endl;
 }
 
 int randomValue(int min, int max) {
@@ -364,34 +301,77 @@ void playerAction() {
 	bool turnOver = false;
 	char response;
 	do {
-		cout << doubleDown[0] << endl;
-		cout << "What would you like to do? (s for stand/h for hit/d for double down) : " << endl;
-		cin >> response;
-		if (response == 's')
+		if (noOfPlayerCards[currentActivePlayer] == 2)
 		{
-			turnOver = true;
+			cout << "What would you like to do? (s for stand/h for hit/d for double down/q for surrender) : " << endl;
+			cin >> response;
+			if (response == 's')
+			{
+				turnOver = true;
+			}
+
+			if (response == 'h')
+			{
+				playerDealtCard(currentActivePlayer, currentCardArrStart);
+				currentScorePlayer();
+			}
+
+			if (response == 'd')
+			{
+				doubleDown[currentActivePlayer] = true;
+
+				playerDealtCard(currentActivePlayer, currentCardArrStart);
+				currentScorePlayer();
+
+				turnOver = true;
+
+			}
+
+			if (response == 'q')
+			{
+				cout << "Player " << playerName[currentActivePlayer] << " has surrendered." << endl;
+				playersPoints[0] = playersPoints[currentActivePlayer] - 5;
+				turnOver = true;
+
+				roundEnd = true;
+				restart();
+			}
+
+			else if (response != 's' && response != 'h' && response != 'd')
+			{
+				cout << "Not valid response." << endl;
+			}
 		}
-
-		if (response == 'h')
+		else
 		{
-			playerDealtCard();
-			currentScorePlayer();
-		}
+			cout << "What would you like to do? (s for stand/h for hit/d for double down) : " << endl;
+			cin >> response;
+			if (response == 's')
+			{
+				turnOver = true;
+			}
 
-		if (response == 'd')
-		{
-			doubleDown[0] = true;
-			
-			playerDealtCard();
-			currentScorePlayer();
+			if (response == 'h')
+			{
+				playerDealtCard(currentActivePlayer, currentCardArrStart);
+				currentScorePlayer();
+			}
 
-			turnOver = true;
+			if (response == 'd')
+			{
+				doubleDown[currentActivePlayer] = true;
 
-		}
+				playerDealtCard(currentActivePlayer, currentCardArrStart);
+				currentScorePlayer();
 
-		else if (response != 's' && response != 'h')
-		{
-			cout << "Not valid response." << endl;
+				turnOver = true;
+
+			}
+
+			else if (response != 's' && response != 'h' && response != 'd')
+			{
+				cout << "Not valid response." << endl;
+			}
 		}
 
 	} while (turnOver == false && doubleDown[0] == false || turnOver == false && roundEnd == false);
@@ -489,48 +469,25 @@ int currentScorePlayer_2(int arg1) {
 }
 
 
-void currentScorePlayer(){
-
-	for (int i = 0; i < noOfPlayerCards[0]; i++)
+void currentScorePlayer() {
+	for (int i = 0; i < noOfPlayers; i++)
 	{
-		int playersCardsValPost = convertCharToInt(playersCards[1][i], playersCardsVal[0]);
-		playersCardsVal[0] = playersCardsValPost;
-
-		cout << "Player's Card #" << (i+1) << "= " << playersCards[1][i] << " of " << playersCards[0][i] << endl;
-	}
-
-	cout << "Player's Total value = " << playersCardsVal[0] << endl;
-
-	if (playersCardsVal[0] == 21 && noOfPlayerCards[0] == 2)
-	{
-		cout << "Player has a blackjack!" << endl;
-
-		if (dealersCardsVal == 21 && noOfDealerCards == 2)
+		for (int j = 0; j < noOfPlayerCards[i]; j++)
 		{
-			cout << "The dealer checks their second card..." << endl;
-			cout << "The card is..." << endl;
-			cout << dealersCards[1][1] << endl;
-			draw("player", "dealer");
+
+			int playersCardsValPost = convertCharToInt(playersCards[currentCardArrStart + 1][j], playersCardsVal[i]);
+			playersCardsVal[currentActivePlayer] = playersCardsValPost;
+
+			cout << "Player " << playerName[i] << "'s Card #" << noOfPlayerCards[j] << " = " << playersCards[currentCardArrStart + 1][j] << " of " << playersCards[currentCardArrStart][j] << endl;
+
 		}
 
-		else
-		{
-			blackjack = true;
-			victory(0, playersPoints[0]);
+		cout << "Player " << playerName[i] << "'s Total value = "  << playersCardsVal[currentActivePlayer] << endl;
+		cout << endl;
 
-			roundEnd = true;
-			restart();
-		}
+		playersCardsVal[currentActivePlayer] = 0;
+		changeActivePlayer();
 	}
-
-	if (playersCardsVal[0] > 21)
-	{
-		bust(1, 0);
-	}
-
-
-
-	playersCardsVal[0] = 0;
 }
 
 void currentScoreDealer_2() {
@@ -569,7 +526,7 @@ void currentScoreDealer() {
 
 }
 
-void playerDealtCard()
+void playerDealtCard(int currentPlayer, int currCardArrStart)
 {
 	int cardSuit = randomValue(0, 3);
 
@@ -858,5 +815,27 @@ int charToInt(char arg, int arg2)
 
 	return arg2;
 
+}
+
+void changeActivePlayer()
+{
+	if (noOfPlayers > 0)
+	{
+
+		if (currentActivePlayer < noOfPlayers)
+		{
+			currentActivePlayer++;
+		}
+
+		if (currentActivePlayer == noOfPlayers)
+		{
+			currentActivePlayer = 0;
+		}
+
+		currentCardArrStart = currentActivePlayer + currentActivePlayer;
+
+		/*cout << "Current active player = " << currentActivePlayer << endl;
+		cout << "Current beginning of active players card array = " << currentCardArrStart << endl;*/
+	}
 }
 

@@ -35,7 +35,7 @@ void currentScoreDealer_2();
 
 int convertCharToInt(char card, int points);
 
-void playerDealtCard(int currentPlayer, int currentPlayerCard);
+void playerDealtCard();
 void playerAction();
 
 void dealerDealtCard();
@@ -43,7 +43,7 @@ void dealersAction();
 
 void checkWinner();
 
-void bust(int playerNo, int startOfCardArr);
+void bust();
 int victory(int winner, int playerPoints);
 void draw(string playerOne, string playerTwo);
 
@@ -301,29 +301,45 @@ void playerAction() {
 	bool turnOver = false;
 	char response;
 	do {
+
 		if (noOfPlayerCards[currentActivePlayer] == 2)
 		{
+
+			cout << "It's Player " << playerName[currentActivePlayer] << "'s turn!" << endl;
+			cout << "--------------------" << endl;
+			currentScorePlayer();
+			cout << "--------------------" << endl;
 			cout << "What would you like to do? (s for stand/h for hit/d for double down/q for surrender) : " << endl;
 			cin >> response;
 			if (response == 's')
 			{
-				turnOver = true;
+				if (currentActivePlayer < noOfPlayers)
+				{
+					changeActivePlayer();
+				}
+				else { currentActivePlayer = noOfPlayers + 1; }
 			}
 
 			if (response == 'h')
 			{
-				playerDealtCard(currentActivePlayer, currentCardArrStart);
+				playerDealtCard();
 				currentScorePlayer();
+				currentScoreDealer();
 			}
 
 			if (response == 'd')
 			{
 				doubleDown[currentActivePlayer] = true;
 
-				playerDealtCard(currentActivePlayer, currentCardArrStart);
+				playerDealtCard();
 				currentScorePlayer();
+				currentScoreDealer();
 
-				turnOver = true;
+				if (currentActivePlayer < noOfPlayers)
+				{
+					changeActivePlayer();
+				}
+				else { currentActivePlayer = noOfPlayers + 1; }
 
 			}
 
@@ -331,10 +347,12 @@ void playerAction() {
 			{
 				cout << "Player " << playerName[currentActivePlayer] << " has surrendered." << endl;
 				playersPoints[0] = playersPoints[currentActivePlayer] - 5;
-				turnOver = true;
+				if (currentActivePlayer < noOfPlayers)
+				{
+					changeActivePlayer();
+				}
+				else { currentActivePlayer = noOfPlayers + 1; }
 
-				roundEnd = true;
-				restart();
 			}
 
 			else if (response != 's' && response != 'h' && response != 'd')
@@ -348,23 +366,33 @@ void playerAction() {
 			cin >> response;
 			if (response == 's')
 			{
-				turnOver = true;
+				if (currentActivePlayer < noOfPlayers)
+				{
+					changeActivePlayer();
+				}
+				else { currentActivePlayer = noOfPlayers + 1; }
 			}
 
 			if (response == 'h')
 			{
-				playerDealtCard(currentActivePlayer, currentCardArrStart);
+				playerDealtCard();
 				currentScorePlayer();
+				currentScoreDealer();
 			}
 
 			if (response == 'd')
 			{
 				doubleDown[currentActivePlayer] = true;
 
-				playerDealtCard(currentActivePlayer, currentCardArrStart);
+				playerDealtCard();
 				currentScorePlayer();
+				currentScoreDealer();
 
-				turnOver = true;
+				if (currentActivePlayer < noOfPlayers)
+				{
+					changeActivePlayer();
+				}
+				else { currentActivePlayer = noOfPlayers + 1; }
 
 			}
 
@@ -374,7 +402,7 @@ void playerAction() {
 			}
 		}
 
-	} while (turnOver == false && doubleDown[0] == false || turnOver == false && roundEnd == false);
+	} while (currentActivePlayer != noOfPlayers + 1);
 }
 
 void dealersAction() {
@@ -425,7 +453,7 @@ void dealersAction() {
 
 		if (dealersCardsVal > 21)
 		{
-			bust(8, 0);
+			bust();
 			if (dealersCardsVal > 21)
 			{
 				getCard = false;
@@ -470,24 +498,55 @@ int currentScorePlayer_2(int arg1) {
 
 
 void currentScorePlayer() {
-	for (int i = 0; i < noOfPlayers; i++)
+	
+	for (int j = 0; j < noOfPlayerCards[currentActivePlayer]; j++)
 	{
-		for (int j = 0; j < noOfPlayerCards[i]; j++)
+
+		int playersCardsValPost = convertCharToInt(playersCards[currentCardArrStart + 1][j], playersCardsVal[currentActivePlayer]);
+		playersCardsVal[currentActivePlayer] = playersCardsValPost;
+
+		cout << "Player " << playerName[currentActivePlayer] << "'s Card  = " << playersCards[currentCardArrStart + 1][j] << " of " << playersCards[currentCardArrStart][j] << endl;
+
+	}
+
+	cout << "Player " << playerName[currentActivePlayer] << "'s Total value = "  << playersCardsVal[currentActivePlayer] << endl;
+	cout << endl;
+
+	if (playersCardsVal[currentActivePlayer] > 21)
+	{
+		cout << "Player " << playerName[currentActivePlayer] << " went bust!" << endl;
+
+		bust();
+
+		if (playersCardsVal[currentActivePlayer] > 21)
 		{
-
-			int playersCardsValPost = convertCharToInt(playersCards[currentCardArrStart + 1][j], playersCardsVal[i]);
-			playersCardsVal[currentActivePlayer] = playersCardsValPost;
-
-			cout << "Player " << playerName[i] << "'s Card #" << noOfPlayerCards[j] << " = " << playersCards[currentCardArrStart + 1][j] << " of " << playersCards[currentCardArrStart][j] << endl;
-
+			if (currentActivePlayer < noOfPlayers)
+			{
+				changeActivePlayer();
+			}
+			else { currentActivePlayer = noOfPlayers + 1; }
 		}
 
-		cout << "Player " << playerName[i] << "'s Total value = "  << playersCardsVal[currentActivePlayer] << endl;
-		cout << endl;
+		else { 
+			playersCardsVal[currentActivePlayer] = 0;
+			for (int j = 0; j < noOfPlayerCards[currentActivePlayer]; j++)
+			{
 
-		playersCardsVal[currentActivePlayer] = 0;
-		changeActivePlayer();
+				int playersCardsValPost = convertCharToInt(playersCards[currentCardArrStart + 1][j], playersCardsVal[currentActivePlayer]);
+				playersCardsVal[currentActivePlayer] = playersCardsValPost;
+
+				cout << "Player " << playerName[currentActivePlayer] << "'s Card  = " << playersCards[currentCardArrStart + 1][j] << " of " << playersCards[currentCardArrStart][j] << endl;
+
+			}
+
+			cout << "Player " << playerName[currentActivePlayer] << "'s Total value = " << playersCardsVal[currentActivePlayer] << endl;
+			cout << endl;
+
+		}
 	}
+
+	playersCardsVal[currentActivePlayer] = 0;
+
 }
 
 void currentScoreDealer_2() {
@@ -526,21 +585,22 @@ void currentScoreDealer() {
 
 }
 
-void playerDealtCard(int currentPlayer, int currCardArrStart)
+void playerDealtCard()
 {
 	int cardSuit = randomValue(0, 3);
 
 	int cardValue = randomValue(0, 12);
 
-	playersCards[1][noOfPlayerCards[0]] = cards[cardSuit][cardValue];
+	playersCards[currentCardArrStart + 1][noOfPlayerCards[currentActivePlayer]] = cards[cardSuit][cardValue];
 
-	if (cardSuit == 0) playersCards[0][noOfPlayerCards[0]] = 's';
-	if (cardSuit == 1) playersCards[0][noOfPlayerCards[0]] = 'h';
-	if (cardSuit == 2) playersCards[0][noOfPlayerCards[0]] = 'd';
-	if (cardSuit == 3) playersCards[0][noOfPlayerCards[0]] = 'c';
+	if (cardSuit == 0) playersCards[currentCardArrStart][noOfPlayerCards[currentActivePlayer]] = 's';
+	if (cardSuit == 1) playersCards[currentCardArrStart][noOfPlayerCards[currentActivePlayer]] = 'h';
+	if (cardSuit == 2) playersCards[currentCardArrStart][noOfPlayerCards[currentActivePlayer]] = 'd';
+	if (cardSuit == 3) playersCards[currentCardArrStart][noOfPlayerCards[currentActivePlayer]] = 'c';
 
-	cout << "The player drew a " << playersCards[1][noOfPlayerCards[0]] << " of " << playersCards[0][noOfPlayerCards[0]] << endl;
-	noOfPlayerCards[0]++;
+	cout << "Player " << playerName[currentActivePlayer] << " drew a " << playersCards[currentCardArrStart + 1][noOfPlayerCards[currentActivePlayer]] << " of " << playersCards[currentCardArrStart][noOfPlayerCards[currentActivePlayer]] << endl;
+
+	noOfPlayerCards[currentActivePlayer]++;
 }
 
 void dealerDealtCard()
@@ -562,35 +622,27 @@ void dealerDealtCard()
 	noOfDealerCards++;
 }
 
-void bust(int playerNo, int startOfCardArr)
+void bust()
 {
-	if (playerNo < 8)
+	if (currentActivePlayer < (noOfPlayers + 1))
 	{
-		for (int i = 0; i < noOfPlayerCards[playerNo - 1]; i++)
+		for (int i = 0; i < noOfPlayerCards[currentActivePlayer]; i++)
 		{
 
-			if (playersCards[startOfCardArr + 1][i] == 'A')
+			if (playersCards[currentCardArrStart + 1][i] == 'A')
 			{
-				while (playersCardsVal[playerNo - 1] > 21)
+				while (playersCardsVal[currentActivePlayer] > 21)
 				{
-					playersCardsVal[playerNo - 1] = playersCardsVal[playerNo - 1] - 10;
-					playersCards[startOfCardArr + 1][i] = 'X';
-					cout << "Player " << playerName[playerNo - 1] << " plays an Ace as a 1." << endl;
-					cout << "Player " << playerName[playerNo - 1] << "'s Total Value = " << playersCardsVal[playerNo - 1] << endl;
+					playersCardsVal[currentActivePlayer] = playersCardsVal[currentActivePlayer] - 10;
+					playersCards[currentCardArrStart + 1][i] = 'X';
+					cout << "Player " << playerName[currentActivePlayer] << " plays an Ace as a 1." << endl;
+					cout << "Player " << playerName[currentActivePlayer] << "'s Total Value = " << playersCardsVal[currentActivePlayer] << endl;
 				}
 			}
 		}
-
-		if (playersCardsVal[playerNo - 1] > 21)
-		{
-			cout << "Player " << playerName[playerNo - 1] << " went bust!" << endl;
-			victory(8, playersPoints[0]);
-			roundEnd = true;
-			restart();
-		}
 	}
 
-	if (playerNo == 8)
+	if (currentActivePlayer == (noOfPlayers + 1))
 	{
 		for (int i = 0; i < noOfDealerCards; i++)
 		{

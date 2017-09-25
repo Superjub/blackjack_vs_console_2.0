@@ -1,0 +1,11 @@
+﻿1>------ Build started: Project: Blackjack_2.0, Configuration: Release x64 ------
+1>Source.cpp
+1>Source.cpp(583): warning C4101: 'i': unreferenced local variable
+1>Generating code
+1>9 of 132 functions ( 6.8%) were compiled, the rest were copied from previous compilation.
+1>  0 functions were new in current compilation
+1>  11 functions had inline decision re-evaluated but remain unchanged
+1>Finished generating code
+1>Blackjack_2.0.vcxproj -> C:\Users\Super\Documents\Visual Studio 2017\Projects\Blackjack_2.0\x64\Release\Blackjack_2.0.exe
+1>Done building project "Blackjack_2.0.vcxproj".
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
